@@ -74,6 +74,7 @@
                     <th>Kategori</th>
                     <th>Lejeperiode</th>
                     <th>CO₂-aftryk (kg)</th>
+                    <th>Udlejningsdato</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,6 +84,7 @@
                     <td>{{ item.category }}</td>
                     <td>{{ item.rental_period }}</td>
                     <td>{{ item.co2 }}</td>
+                    <td>{{ item.date }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
