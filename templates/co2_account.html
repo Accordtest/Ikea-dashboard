@@ -7,106 +7,132 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>CO₂ Regnskab</h1>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333;">
+    <div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h1 style="color: #00509e; text-align: center;">CO₂ Regnskab for {{ user['username'] }}</h1>
 
         <!-- Samlet CO₂-aftryk -->
-        <h2>Samlet CO<sub>2</sub>-aftryk:</h2>
-        <p style="color: {{ 'red' if total_co2 > 0 else 'green' }}; font-size: 1.5em; font-weight: bold;">
+        <h2 style="color: #003366;">Dit CO<sub>2</sub>-aftryk:</h2>
+        <p style="color: {{ 'red' if total_co2 > 0 else 'green' }}; font-size: 1.5em; font-weight: bold; text-align: center;">
             {{ total_co2 }} kg CO<sub>2</sub>
         </p>
+        {% if total_co2 > 0 %}
+        <p style="font-size: 1em; text-align: center; margin-bottom: 20px;">
+            Dette er dit samlede CO₂-aftryk baseret på dine valg. Du kan reducere det yderligere ved at vælge mere bæredygtige muligheder!
+        </p>
+        {% else %}
+        <h3 style="color: green; text-align: center;">Tillykke! Du har et CO₂-neutralt regnskab!</h3>
+        {% endif %}
+
+        <!-- Gamification Badge -->
+        {% if total_co2 <= 100 %}
+        <div style="background-color: #28a745; color: white; text-align: center; padding: 10px; border-radius: 10px; margin: 20px 0;">
+            🌟 Miljøhelt! 🌟 Du har holdt dit CO₂-aftryk under 100 kg.
+        </div>
+        {% endif %}
+
+        <!-- Hypotetisk CO₂-aftryk -->
+        <h2 style="color: #003366;">Hvad hvis?</h2>
+        <p>Hvis du kun havde købt:</p>
+        <p style="font-weight: bold; color: red;">{{ hypothetical_co2.hypothetical_purchase | round(2) }} kg CO<sub>2</sub></p>
+        <p>Hvis du kun havde lejet:</p>
+        <p style="font-weight: bold; color: green;">{{ hypothetical_co2.hypothetical_rental | round(2) }} kg CO<sub>2</sub></p>
+        <p>Ved at leje kan du spare værdifulde ressourcer og reducere dit CO₂-aftryk betydeligt.</p>
 
         <!-- Donationsopfordring -->
         {% if donation_info.trees_needed > 0 %}
-        <h2>Forbedr dit CO<sub>2</sub>-regnskab:</h2>
+        <h2 style="color: #00509e;">Bliv CO₂-neutral:</h2>
         <p>{{ donation_info.message }}</p>
-        <button class="button" id="donateButton">Donér {{ donation_info.donation_amount }} kr.</button>
-        <p id="donationMessage" style="display: none; color: green; font-weight: bold;">
+        <button class="button" id="donateButton" style="background-color: #ff6f61; color: white; border: none; padding: 10px 20px; font-size: 1em; cursor: pointer; border-radius: 5px;">Donér {{ donation_info.donation_amount }} kr.</button>
+        <p id="donationMessage" style="display: none; color: green; font-weight: bold; margin-top: 10px;">
             Tak for din donation! Du er nu på vej mod et bedre CO₂-regnskab.
         </p>
-        {% else %}
-        <h2>Tillykke!</h2>
-        <p>Du har allerede et fantastisk CO<sub>2</sub>-regnskab. Fortsæt det gode arbejde!</p>
         {% endif %}
 
         <!-- Diagrammer -->
-        <h2>Cirkeldiagram: Køb vs Leje</h2>
-        <canvas id="co2PieChart" width="400" height="400"></canvas>
-
-        <h2>Søjlediagram: CO<sub>2</sub> pr. Produkt</h2>
+        <h2 style="color: #003366;">Dine CO₂-data:</h2>
+        <p>Her kan du se en opdeling af dit CO₂-aftryk pr. produkt og sammenligne køb med leje.</p>
         <canvas id="co2BarChart" width="400" height="400"></canvas>
-        </div>
+        <canvas id="co2PieChart" width="400" height="400" style="margin-top: 20px;"></canvas>
+
+        <!-- Forklaring -->
+        <h2 style="color: #00509e;">Hvorfor vælge leje?</h2>
+        <p>
+            Leje gør det muligt at dele ressourcer og forlænger levetiden for produkter. 
+            Det reducerer behovet for ny produktion, hvilket sparer både råmaterialer og energi.
+        </p>
+        <p>
+            Vidste du, at ved at leje dine møbler kan du reducere dit CO₂-aftryk med op til 30% sammenlignet med køb?
+        </p>
+
         <!-- Navigation -->
-         <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
-         <a href="{{ url_for('logout') }}" class="button">Log ud</a>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('dashboard', username=username) }}" class="button" style="background-color: #007bff;">Tilbage til Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="button" style="background-color: #dc3545; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-left: 10px;">Log ud</a>
         </div>
+    </div>
+
     <script>
         // Data fra serveren
         const purchaseData = {{ purchase_data | tojson | safe }};
         const rentalData = {{ rental_data | tojson | safe }};
+        const hypotheticalCo2 = {{ hypothetical_co2 | tojson | safe }};
 
-        // Kombinér køb og leje data
-        const allData = {
-            ...Object.fromEntries(Object.entries(purchaseData).map(([key, value]) => [key + " (køb)", value])),
-            ...Object.fromEntries(Object.entries(rentalData).map(([key, value]) => [key + " (leje)", value]))
-        };
+        // Bar chart data
+        const barLabels = [...Object.keys(purchaseData), ...Object.keys(rentalData)];
+        const barValues = [...Object.values(purchaseData), ...Object.values(rentalData)];
+        const barColors = [...Object.keys(purchaseData).map(() => 'red'), ...Object.keys(rentalData).map(() => 'green')];
 
-        const allLabels = Object.keys(allData); // Produktnavne
-        const allValues = Object.values(allData); // CO₂ værdier
-        const allColors = Object.keys(purchaseData).map(() => "red").concat(Object.keys(rentalData).map(() => "green"));
-
-        // Cirkeldiagram
-        const pieCtx = document.getElementById('co2PieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: allLabels,
-                datasets: [{
-                    data: allValues,
-                    backgroundColor: allColors
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw} kg CO₂`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Søjlediagram
         const barCtx = document.getElementById('co2BarChart').getContext('2d');
         new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: allLabels,
+                labels: barLabels,
                 datasets: [{
                     label: "CO₂ i kg",
-                    data: allValues,
-                    backgroundColor: allColors
+                    data: barValues,
+                    backgroundColor: barColors
                 }]
             },
             options: {
                 responsive: true,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });
 
-        // Donationsknap funktion
+        // Pie chart data
+        const pieLabels = ['Køb', 'Leje'];
+        const pieValues = [
+            Object.values(purchaseData).reduce((acc, val) => acc + val, 0),
+            Object.values(rentalData).reduce((acc, val) => acc + val, 0)
+        ];
+
+        const pieCtx = document.getElementById('co2PieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieValues,
+                    backgroundColor: ['red', 'green']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' }
+                }
+            }
+        });
+
+        // Donation knap funktion
         document.getElementById('donateButton')?.addEventListener('click', () => {
             document.getElementById('donationMessage').style.display = 'block';
         });
     </script>
 </body>
 </html>
-    

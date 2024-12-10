@@ -5,15 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - IKEA</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #00509e;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Velkommen, {{ username }}</h1>
+        <h1>Velkommen, {{ user['username'] }}</h1>
         <p>Hvad vil du se?</p>
         <a href="{{ url_for('purchase_history', username=username) }}" class="button">Købshistorik</a>
         <a href="{{ url_for('rental_history', username=username) }}" class="button">Lejehistorik</a>
         <a href="{{ url_for('co2_account', username=username) }}" class="button">CO₂ Regnskab</a>
-        <a href="{{ url_for('logout') }}" class="button">Log ud</a>
+        <a href="{{ url_for('logout') }}" class="button" style="background-color: #dc3545;">Log ud</a>           
     </div>
 </body>
 </html>

@@ -5,21 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Købshistorik</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #00509e;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #00509e;
+            color: white;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.logout {
+            background-color: #dc3545;
+        }
+        .no-purchases {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Købshistorik</h1>
+        <h1>Købshistorik for {{ user['username'] }}</h1>
         {% if purchases %}
-        <ul>
-            {% for item in purchases %}
-            <li>{{ item.date }}: {{ item.name }} ({{ item.category }}) - {{ item.price }} DKK</li>
-            {% endfor %}
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dato</th>
+                    <th>Produkt</th>
+                    <th>Kategori</th>
+                    <th>Pris (DKK)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in purchases %}
+                <tr>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% else %}
-        <p>Ingen køb registreret.</p>
+        <p class="no-purchases">Ingen køb registreret.</p>
         {% endif %}
-        <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
-        <a href="{{ url_for('logout') }}" class="button">Log ud</a>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="button logout">Log ud</a>
+        </div>
     </div>
 </body>
 </html>
