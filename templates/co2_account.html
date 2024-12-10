@@ -3,62 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CO2-Regnskab</title>
+    <title>CO₂ Regnskab</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>CO<sub>2</sub>-Regnskab</h1>
+        <h1>CO₂ Regnskab</h1>
 
-        <!-- Samlet CO2-aftryk -->
-        <h2>Dit CO<sub>2</sub>-aftryk er:</h2>
+        <!-- Samlet CO₂-aftryk -->
+        <h2>Samlet CO<sub>2</sub>-aftryk:</h2>
         <p style="color: {{ 'red' if total_co2 > 0 else 'green' }}; font-size: 1.5em; font-weight: bold;">
-    {{ total_co2 }} kg CO<sub>2</sub>
-</p>
+            {{ total_co2 }} kg CO<sub>2</sub>
+        </p>
 
+        <!-- Donationsopfordring -->
+        {% if donation_info.trees_needed > 0 %}
+        <h2>Forbedr dit CO<sub>2</sub>-regnskab:</h2>
+        <p>{{ donation_info.message }}</p>
+        <button class="button" id="donateButton">Donér {{ donation_info.donation_amount }} kr.</button>
+        <p id="donationMessage" style="display: none; color: green; font-weight: bold;">
+            Tak for din donation! Du er nu på vej mod et bedre CO₂-regnskab.
+        </p>
+        {% else %}
+        <h2>Tillykke!</h2>
+        <p>Du har allerede et fantastisk CO<sub>2</sub>-regnskab. Fortsæt det gode arbejde!</p>
+        {% endif %}
 
-        <!-- Cirkeldiagram -->
+        <!-- Diagrammer -->
         <h2>Cirkeldiagram: Køb vs Leje</h2>
         <canvas id="co2PieChart" width="400" height="400"></canvas>
 
-        <!-- Søjlediagram -->
-        <h2>Søjlediagram: CO2 pr. Produkt</h2>
+        <h2>Søjlediagram: CO<sub>2</sub> pr. Produkt</h2>
         <canvas id="co2BarChart" width="400" height="400"></canvas>
 
-        <a href="{{ url_for('dashboard') }}" class="button">Tilbage til Dashboard</a>
+        <!-- Tilbage til Dashboard -->
+        <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
     </div>
 
     <script>
         // Data fra serveren
-        const purchaseData = {{ purchase_data | tojson }};
-        const rentalData = {{ rental_data | tojson }};
+        const purchaseData = {{ purchase_data | tojson | safe }};
+        const rentalData = {{ rental_data | tojson | safe }};
 
-        // Data til cirkeldiagrammet
-        const pieLabels = [...Object.keys(purchaseData), ...Object.keys(rentalData)];
-        const pieData = [...Object.values(purchaseData), ...Object.values(rentalData)];
-        const pieColors = [
-            ...Array(Object.keys(purchaseData).length).fill('red'),
-            ...Array(Object.keys(rentalData).length).fill('green')
-        ];
+        // Kombinér køb og leje data
+        const allData = {
+            ...Object.fromEntries(Object.entries(purchaseData).map(([key, value]) => [key + " (køb)", value])),
+            ...Object.fromEntries(Object.entries(rentalData).map(([key, value]) => [key + " (leje)", value]))
+        };
 
-        // Data til søjlediagrammet
-        const barLabels = [...Object.keys(purchaseData), ...Object.keys(rentalData)];
-        const barData = [...Object.values(purchaseData), ...Object.values(rentalData)];
-        const barColors = [
-            ...Array(Object.keys(purchaseData).length).fill('red'),
-            ...Array(Object.keys(rentalData).length).fill('green')
-        ];
+        const allLabels = Object.keys(allData); // Produktnavne
+        const allValues = Object.values(allData); // CO₂ værdier
+        const allColors = Object.keys(purchaseData).map(() => "red").concat(Object.keys(rentalData).map(() => "green"));
 
         // Cirkeldiagram
         const pieCtx = document.getElementById('co2PieChart').getContext('2d');
         new Chart(pieCtx, {
             type: 'pie',
             data: {
-                labels: pieLabels,
+                labels: allLabels,
                 datasets: [{
-                    data: pieData,
-                    backgroundColor: pieColors
+                    data: allValues,
+                    backgroundColor: allColors
                 }]
             },
             options: {
@@ -68,7 +74,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.label}: ${context.raw} kg CO2`;
+                                return `${context.label}: ${context.raw} kg CO₂`;
                             }
                         }
                     }
@@ -81,11 +87,11 @@
         new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: barLabels,
+                labels: allLabels,
                 datasets: [{
-                    label: 'CO2 i kg',
-                    data: barData,
-                    backgroundColor: barColors
+                    label: "CO₂ i kg",
+                    data: allValues,
+                    backgroundColor: allColors
                 }]
             },
             options: {
@@ -94,6 +100,11 @@
                     y: { beginAtZero: true }
                 }
             }
+        });
+
+        // Donationsknap funktion
+        document.getElementById('donateButton')?.addEventListener('click', () => {
+            document.getElementById('donationMessage').style.display = 'block';
         });
     </script>
 </body>

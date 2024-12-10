@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lejehistorik</title>
-    <!-- Tilføj CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Lejehistorik</h1>
+        {% if rentals %}
         <ul>
-            {% for rental in rentals %}
-            <li>{{ rental.name }} ({{ rental.category }}) - Lejeperiode: {{ rental.rental_period }}</li>
+            {% for item in rentals %}
+            <li>{{ item.name }} ({{ item.category }}) - Lejeperiode: {{ item.rental_period }}</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('dashboard') }}" class="button">Tilbage til Dashboard</a>
+        {% else %}
+        <p>Ingen lejede produkter registreret.</p>
+        {% endif %}
+        <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
     </div>
 </body>
 </html>
