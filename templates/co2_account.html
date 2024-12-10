@@ -36,11 +36,11 @@
 
         <h2>Søjlediagram: CO<sub>2</sub> pr. Produkt</h2>
         <canvas id="co2BarChart" width="400" height="400"></canvas>
-
-        <!-- Tilbage til Dashboard -->
-        <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
-    </div>
-
+        </div>
+        <!-- Navigation -->
+         <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
+         <a href="{{ url_for('logout') }}" class="button">Log ud</a>
+        </div>
     <script>
         // Data fra serveren
         const purchaseData = {{ purchase_data | tojson | safe }};
@@ -109,3 +109,4 @@
     </script>
 </body>
 </html>
+    

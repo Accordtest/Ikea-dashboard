@@ -19,6 +19,7 @@
         <p>Ingen lejede produkter registreret.</p>
         {% endif %}
         <a href="{{ url_for('dashboard', username=username) }}" class="button">Tilbage til Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="button">Log ud</a>
     </div>
 </body>
 </html>
