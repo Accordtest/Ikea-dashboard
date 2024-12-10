@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2 Regnskab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>CO2 Regnskab</h1>
+
+        <!-- Samlet CO2-aftryk -->
+        <h2>Dit CO<sub>2</sub>-aftryk er:</h2>
+        <p style="color: {{ 'red' if total_co2 > 0 else 'green' }}; font-size: 1.5em; font-weight: bold;">
+    {{ total_co2 }} kg CO<sub>2</sub>
+</p>
+
+
+        <!-- Cirkeldiagram -->
+        <h2>Cirkeldiagram: Køb vs Leje</h2>
+        <canvas id="co2PieChart" width="400" height="400"></canvas>
+
+        <!-- Søjlediagram -->
+        <h2>Søjlediagram: CO2 pr. Produkt</h2>
+        <canvas id="co2BarChart" width="400" height="400"></canvas>
+
+        <a href="{{ url_for('dashboard') }}" class="button">Tilbage til Dashboard</a>
+    </div>
+
+    <script>
+        // Data fra serveren
+        const purchaseData = {{ purchase_data | tojson }};
+        const rentalData = {{ rental_data | tojson }};
+
+        // Data til cirkeldiagrammet
+        const pieLabels = [...Object.keys(purchaseData), ...Object.keys(rentalData)];
+        const pieData = [...Object.values(purchaseData), ...Object.values(rentalData)];
+        const pieColors = [
+            ...Array(Object.keys(purchaseData).length).fill('red'),
+            ...Array(Object.keys(rentalData).length).fill('green')
+        ];
+
+        // Data til søjlediagrammet
+        const barLabels = [...Object.keys(purchaseData), ...Object.keys(rentalData)];
+        const barData = [...Object.values(purchaseData), ...Object.values(rentalData)];
+        const barColors = [
+            ...Array(Object.keys(purchaseData).length).fill('red'),
+            ...Array(Object.keys(rentalData).length).fill('green')
+        ];
+
+        // Cirkeldiagram
+        const pieCtx = document.getElementById('co2PieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieData,
+                    backgroundColor: pieColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} kg CO2`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Søjlediagram
+        const barCtx = document.getElementById('co2BarChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: barLabels,
+                datasets: [{
+                    label: 'CO2 i kg',
+                    data: barData,
+                    backgroundColor: barColors
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
