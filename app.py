@@ -121,16 +121,19 @@ def co2_account(username):
     total_co2 = calculate_total_co2(purchase_history, rental_history)
     hypothetical_co2 = calculate_hypothetical_co2(purchase_history, rental_history)
     donation_info = calculate_donation_and_trees(total_co2)
+    
+    # Beregn procent for CO₂-neutralitet
+    progress_percentage = max(0, 100 - total_co2)
 
     return render_template(
         "co2_account.html",
         user=user,
-        username=username,  # Send profilnøglen til skabelonen
         purchase_data={item["name"]: item["co2"] for item in purchase_history},
         rental_data={item["name"]: item["co2"] for item in rental_history},
         total_co2=total_co2,
         hypothetical_co2=hypothetical_co2,
-        donation_info=donation_info
+        donation_info=donation_info,
+        progress_percentage=progress_percentage
     )
 
 @app.route("/logout")
