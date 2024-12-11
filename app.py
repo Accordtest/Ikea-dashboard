@@ -20,7 +20,7 @@ users = {
             {"name": "Kallax hylde", "category": "Møbler", "price": 700, "date": "2024-01-10", "co2": 60}
         ],
         "rental_history": [
-            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12, "date": "2024-02-04"}
+            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12}
         ]
     },
     "profil_c": {
@@ -28,16 +28,17 @@ users = {
         "password": "test123",
         "purchase_history": [],
         "rental_history": [
-            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "24 måneder", "co2": 0.68 * 24, "date": "2024-01-04"},
-            {"name": "Ivar hylde", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12, "date": "2024-03-08"}
+            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "24 måneder", "co2": 0.68 * 24},
+            {"name": "Ivar hylde", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12}
         ]
     }
 }
 
+# Funktioner til beregning af CO₂
+
 def calculate_total_co2(purchase_history, rental_history):
     """Beregner samlet CO₂-aftryk."""
-    total = sum(item["co2"] for item in purchase_history) + sum(item["co2"] for item in rental_history)
-    return total
+    return sum(item["co2"] for item in purchase_history) + sum(item["co2"] for item in rental_history)
 
 def calculate_hypothetical_co2(purchase_history, rental_history):
     """Beregner hypotetisk CO₂-aftryk."""
@@ -68,6 +69,8 @@ def calculate_donation_and_trees(total_co2):
         "message": f"For at blive CO₂-neutral skal du plante {round(trees_needed)} træer til en pris af {round(donation_amount, 2)} kr."
     }
 
+# Ruter
+
 @app.route("/", methods=["GET", "POST"])
 def login():
     """Login-side."""
@@ -83,14 +86,11 @@ def login():
         return render_template("login.html", error="Ugyldigt brugernavn eller kodeord.")
     return render_template("login.html", error=None)
 
-
 @app.route("/dashboard/<username>")
 def dashboard(username):
     """Dashboard."""
     user = users.get(username)
-    print(f"DEBUG: username = {username}, user = {user}")
     if not user:
-        print(f"User not found for username: {username}")
         return redirect(url_for("login"))
     return render_template("dashboard.html", user=user, username=username)
 
@@ -121,19 +121,16 @@ def co2_account(username):
     total_co2 = calculate_total_co2(purchase_history, rental_history)
     hypothetical_co2 = calculate_hypothetical_co2(purchase_history, rental_history)
     donation_info = calculate_donation_and_trees(total_co2)
-    
-    # Beregn procent for CO₂-neutralitet
-    progress_percentage = max(0, 100 - total_co2)
 
     return render_template(
         "co2_account.html",
         user=user,
+        username=username,  # Sikrer at username er korrekt videregivet
         purchase_data={item["name"]: item["co2"] for item in purchase_history},
         rental_data={item["name"]: item["co2"] for item in rental_history},
         total_co2=total_co2,
         hypothetical_co2=hypothetical_co2,
-        donation_info=donation_info,
-        progress_percentage=progress_percentage
+        donation_info=donation_info
     )
 
 @app.route("/logout")

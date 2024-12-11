@@ -61,7 +61,7 @@
         <!-- Navigation -->
         <div style="text-align: center; margin-top: 20px;">
             <a href="{{ url_for('dashboard', username=username) }}" class="button" style="background-color: #0058A3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 5px;">Tilbage til Dashboard</a>
-            <a href="{{ url_for('logout') }}" class="button" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 5px;">Log ud</a>
+            <a href="{{ url_for('logout') }}" class="button logout" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 5px;">Log ud</a>
         </div>
     </div>
 
@@ -136,7 +136,7 @@
             }
         });
 
-    // Donation knap funktion
+        // Donation knap funktion
         document.getElementById('donateButton')?.addEventListener('click', () => {
             document.getElementById('donationMessage').style.display = 'block';
         });
