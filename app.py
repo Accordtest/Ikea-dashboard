@@ -20,7 +20,7 @@ users = {
             {"name": "Kallax hylde", "category": "Møbler", "price": 700, "date": "2024-01-10", "co2": 60}
         ],
         "rental_history": [
-            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12}
+            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12, "date": "2024-02-04"}
         ]
     },
     "profil_c": {
@@ -28,8 +28,8 @@ users = {
         "password": "test123",
         "purchase_history": [],
         "rental_history": [
-            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "24 måneder", "co2": 0.68 * 24},
-            {"name": "Ivar hylde", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12}
+            {"name": "Xenium kontorstol", "category": "Møbler", "rental_period": "24 måneder", "co2": 0.68 * 24, "date": "2024-01-04"},
+            {"name": "Ivar hylde", "category": "Møbler", "rental_period": "12 måneder", "co2": 0.68 * 12, "date": "2024-03-08"}
         ]
     }
 }
